@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -5,14 +8,41 @@ import java.util.Scanner;
  */
 public class Main {
 
-    public static final String testSet = "iris-test.txt";
-    public static final String trainSet = "iris-training.txt";
+    private ArrayList<Iris> trainingSet = new ArrayList<Iris>();
+    private ArrayList<Iris> testingSet = new ArrayList<Iris>();
 
-    public static void main (String[] args){
-        System.out.print("What is your k value?");
-        Scanner sc = new Scanner(System.in);
-        int k = sc.nextInt();
-        System.out.print("k: "+ k);
+    private void loadData (String train, String test){
+        try {
+            Scanner scanTrain = new Scanner(new File(train));
+            Scanner scanTest = new Scanner(new File(test));
+
+            while (scanTrain.hasNext()){
+                double sepalLength = scanTrain.nextDouble();
+                double sepalWidth = scanTrain.nextDouble();
+                double petalLength = scanTrain.nextDouble();
+                double petalWidth = scanTrain.nextDouble();
+                String type = scanTrain.next();
+
+                trainingSet.add(new Iris(sepalLength,sepalWidth,petalLength,petalWidth));
+            }
+
+            while (scanTest.hasNext()){
+                double sepalLength = scanTrain.nextDouble();
+                double sepalWidth = scanTrain.nextDouble();
+                double petalLength = scanTrain.nextDouble();
+                double petalWidth = scanTrain.nextDouble();
+                String type = scanTrain.next();
+
+                testingSet.add(new Iris(sepalLength,sepalWidth,petalLength,petalWidth));
+            }
+            scanTrain.close();
+            scanTest.close();
+        }
+        catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+
+
     }
 
 }
