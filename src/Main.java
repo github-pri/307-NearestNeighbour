@@ -1,7 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Created by Pri on 23/03/2017.
@@ -119,6 +119,75 @@ public class Main {
         double sepalW = Math.pow((i1.getSepalWidth() - i2.getSepalWidth())/swRange, 2);
 
         return Math.sqrt(petalL + petalW + sepalL + sepalW);
+    }
+
+    public HashMap<Double,String> getDistances(ArrayList<Iris> instances, Iris test){
+        HashMap<Double,String> dists = new HashMap<Double, String>();
+        for (Iris i: instances){
+            double distance = calculateDistance(test,i);
+            dists.put(distance,i.getType());
+        }
+
+        return dists;
+    }
+
+    public HashMap<Double,String> closest (int k, ArrayList<Double> distanceList, HashMap<Double, String> distances){
+        HashMap<Double,String> result = new HashMap<Double,String>();
+        int i = 0;
+        while (i<k){
+            result.put(distanceList.get(i), distances.get(i));
+            i++;
+        }
+        return result;
+    }
+
+    public String sortClosest (int k, HashMap<Double,String> neighbours){
+        HashMap<String,Integer> closeNeighbours = new HashMap<String,Integer>();
+        String i;
+        int j=0;
+        for (Map.Entry<Double,String> mapEntry: neighbours.entrySet()){
+            while(j<k){
+                i = mapEntry.getValue();
+                if(closeNeighbours.containsKey(i)){
+                    int sort = closeNeighbours.get(i);
+                    sort++;
+                }
+            }
+        }
+        return (String) closeNeighbours.keySet().toArray()[0];
+    }
+
+    public String performAlg (ArrayList<Iris> trainingList, Iris test, int k){
+        HashMap<Double,String> distances = getDistances(trainingList,test);
+        ArrayList<Double> distanceList = new ArrayList<Double>(distances.keySet());
+        Collections.sort(distanceList);
+
+        HashMap<Double,String> neighbours = closest(k,distanceList,distances);
+        String result = sortClosest(k,neighbours);
+        return result;
+    }
+
+    public double getAccuracy(ArrayList<Iris> instances, ArrayList<String> predictions){
+        double correctPred = 0;
+        for(int i=0;i<instances.size()-1;i++){
+            if(instances.get(i).getType().equals(predictions.get(i))){
+                correctPred++;
+            }
+        }
+        correctPred = (correctPred/instances.size())*100.00;
+        return correctPred;
+    }
+
+    public static void main (String[] args){
+        Main main  = new Main();
+        main.loadData(args[0],args[1]);
+        ArrayList<String> predictions = new ArrayList<String>();
+        for(Iris i: main.testingSet){
+            String result = main.performAlg(main.trainingSet,i,3);
+            predictions.add(result);
+        }
+        double accuracy =  main.getAccuracy(main.testingSet,predictions);
+
     }
 
 }
