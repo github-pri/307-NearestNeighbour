@@ -3,7 +3,10 @@
  */
 public class Iris {
 
-    private double sepalLength, sepalWidth, petalLength, petalWidth;
+    private double sepalLength;
+    private double sepalWidth;
+    private double petalLength;
+    private double petalWidth;
     private String type;
 
     public Iris (double sepalLength, double sepalWidth, double petalLength, double petalWidth,String type){

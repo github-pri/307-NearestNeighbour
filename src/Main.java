@@ -1,6 +1,5 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -11,7 +10,7 @@ public class Main {
     private ArrayList<Iris> trainingSet = new ArrayList<Iris>();
     private ArrayList<Iris> testingSet = new ArrayList<Iris>();
 
-    private void loadData (String train, String test){
+    public void loadData (String train, String test){
         try {
             Scanner scanTrain = new Scanner(new File(train));
             Scanner scanTest = new Scanner(new File(test));
@@ -27,11 +26,11 @@ public class Main {
             }
 
             while (scanTest.hasNext()){
-                double sepalLength = scanTrain.nextDouble();
-                double sepalWidth = scanTrain.nextDouble();
-                double petalLength = scanTrain.nextDouble();
-                double petalWidth = scanTrain.nextDouble();
-                String type = scanTrain.next();
+                double sepalLength = scanTest.nextDouble();
+                double sepalWidth = scanTest.nextDouble();
+                double petalLength = scanTest.nextDouble();
+                double petalWidth = scanTest.nextDouble();
+                String type = scanTest.next();
 
                 testingSet.add(new Iris(sepalLength,sepalWidth,petalLength,petalWidth,type));
             }
@@ -52,9 +51,9 @@ public class Main {
             return 0;
         }
 
-        if (type=="sepalLength"){
+        if (type.equals("sepalLength")){
             max = instances.get(0).getSepalLength();
-            min = max;
+            min = instances.get(0).getSepalLength();
             for (Iris i:instances){
                 if (i.getSepalLength()>max){
                     max = i.getSepalLength();
@@ -65,9 +64,9 @@ public class Main {
             }
         }
 
-        else if (type=="sepalWidth"){
+        else if (type.equals("sepalWidth")){
             max = instances.get(0).getSepalWidth();
-            min = max;
+            min = instances.get(0).getSepalWidth();
             for (Iris i:instances){
                 if (i.getSepalWidth()>max){
                     max = i.getSepalWidth();
@@ -78,9 +77,9 @@ public class Main {
             }
         }
 
-        else if (type=="petalLength"){
+        else if (type.equals("petalLength")){
             max = instances.get(0).getPetalLength();
-            min = max;
+            min = instances.get(0).getPetalLength();
             for (Iris i:instances){
                 if (i.getPetalLength()>max){
                     max = i.getPetalLength();
@@ -91,9 +90,9 @@ public class Main {
             }
         }
 
-        else if (type=="petalWidth"){
+        else if (type.equals("petalWidth")){
             max = instances.get(0).getPetalWidth();
-            min = max;
+            min = instances.get(0).getPetalWidth();
             for (Iris i:instances){
                 if (i.getPetalWidth()>max){
                     max = i.getPetalWidth();
@@ -113,12 +112,13 @@ public class Main {
         double pLRange = calculateRange(trainingSet, "petalLength");
         double pwRange = calculateRange(trainingSet, "petalWidth");
 
-        double petalL = Math.pow((i1.getPetalLength() - i2.getPetalLength())/pLRange,2);
-        double petalW = Math.pow((i1.getPetalWidth() - i2.getPetalWidth())/pwRange,2);
         double sepalL = Math.pow((i1.getSepalLength() - i2.getSepalLength())/sLRange,2);
         double sepalW = Math.pow((i1.getSepalWidth() - i2.getSepalWidth())/swRange, 2);
+        double petalL = Math.pow((i1.getPetalLength() - i2.getPetalLength())/pLRange,2);
+        double petalW = Math.pow((i1.getPetalWidth() - i2.getPetalWidth())/pwRange,2);
 
-        return Math.sqrt(petalL + petalW + sepalL + sepalW);
+
+        return Math.sqrt(sepalL+sepalW+petalL+petalW);
     }
 
     public HashMap<Double,String> getDistances(ArrayList<Iris> instances, Iris test){
@@ -151,13 +151,19 @@ public class Main {
                 if(closeNeighbours.containsKey(i)){
                     int sort = closeNeighbours.get(i);
                     sort++;
+                    closeNeighbours.put(mapEntry.getValue(),sort);
                 }
+                else{
+                    closeNeighbours.put(mapEntry.getValue(),1);
+                }
+                j++;
+                break;
             }
         }
         return (String) closeNeighbours.keySet().toArray()[0];
     }
 
-    public String performAlg (ArrayList<Iris> trainingList, Iris test, int k){
+    public String knnAlg (ArrayList<Iris> trainingList, Iris test, int k){
         HashMap<Double,String> distances = getDistances(trainingList,test);
         ArrayList<Double> distanceList = new ArrayList<Double>(distances.keySet());
         Collections.sort(distanceList);
@@ -169,7 +175,7 @@ public class Main {
 
     public double getAccuracy(ArrayList<Iris> instances, ArrayList<String> predictions){
         double correctPred = 0;
-        for(int i=0;i<instances.size()-1;i++){
+        for(int i=0;i<=instances.size()-1;i++){
             if(instances.get(i).getType().equals(predictions.get(i))){
                 correctPred++;
             }
@@ -180,13 +186,14 @@ public class Main {
 
     public static void main (String[] args){
         Main main  = new Main();
-        main.loadData(args[0],args[1]);
+        main.loadData("iris-training.txt","iris-test.txt");
         ArrayList<String> predictions = new ArrayList<String>();
         for(Iris i: main.testingSet){
-            String result = main.performAlg(main.trainingSet,i,3);
+            String result = main.knnAlg(main.trainingSet,i,3);
             predictions.add(result);
         }
         double accuracy =  main.getAccuracy(main.testingSet,predictions);
+        System.out.print("The algorithm is "+accuracy+"% accurate");
 
     }
 
