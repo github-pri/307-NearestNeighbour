@@ -24,6 +24,7 @@ public class Main {
 
                 trainingSet.add(new Iris(sepalLength,sepalWidth,petalLength,petalWidth, type));
             }
+            System.out.println(trainingSet.size());
 
             while (scanTest.hasNext()){
                 double sepalLength = scanTest.nextDouble();
@@ -112,11 +113,17 @@ public class Main {
         double pLRange = calculateRange(trainingSet, "petalLength");
         double pwRange = calculateRange(trainingSet, "petalWidth");
 
-        double sepalL = Math.pow((i1.getSepalLength() - i2.getSepalLength())/sLRange,2);
-        double sepalW = Math.pow((i1.getSepalWidth() - i2.getSepalWidth())/swRange, 2);
-        double petalL = Math.pow((i1.getPetalLength() - i2.getPetalLength())/pLRange,2);
-        double petalW = Math.pow((i1.getPetalWidth() - i2.getPetalWidth())/pwRange,2);
+        double sepalL = Math.pow((i1.getSepalLength() - i2.getSepalLength()),2)/Math.pow(sLRange,2);
+        double sepalW = Math.pow((i1.getSepalWidth() - i2.getSepalWidth()), 2)/Math.pow(swRange,2);
+        double petalL = Math.pow((i1.getPetalLength() - i2.getPetalLength()),2)/Math.pow(pLRange,2);
+        double petalW = Math.pow((i1.getPetalWidth() - i2.getPetalWidth()),2)/Math.pow(pwRange,2);
 
+//        double sepalL = Math.pow((i1.getSepalLength() - i2.getSepalLength())/sLRange,2);
+//        double sepalW = Math.pow((i1.getSepalWidth() - i2.getSepalWidth())/swRange, 2);
+//        double petalL = Math.pow((i1.getPetalLength() - i2.getPetalLength())/pLRange,2);
+//        double petalW = Math.pow((i1.getPetalWidth() - i2.getPetalWidth())/pwRange,2);
+
+        //System.out.println("spl"+sepalL +"spw"+sepalW+ "ptl"+petalL+ "ptw"+petalW);
 
         return Math.sqrt(sepalL+sepalW+petalL+petalW);
     }
@@ -125,6 +132,7 @@ public class Main {
         HashMap<Double,String> dists = new HashMap<Double, String>();
         for (Iris i: instances){
             double distance = calculateDistance(test,i);
+            //System.out.println("t: "+i.getType() + "dist: "+distance);
             dists.put(distance,i.getType());
         }
 
@@ -135,7 +143,8 @@ public class Main {
         HashMap<Double,String> result = new HashMap<Double,String>();
         int i = 0;
         while (i<k){
-            result.put(distanceList.get(i), distances.get(i));
+            result.put(distanceList.get(i), distances.get(distanceList.get(i)));
+            //System.out.println(distanceList.get(i) + "" +distances.get(i));
             i++;
         }
         return result;
@@ -148,8 +157,10 @@ public class Main {
         for (Map.Entry<Double,String> mapEntry: neighbours.entrySet()){
             while(j<k){
                 i = mapEntry.getValue();
+                //System.out.println("i: "+i);
                 if(closeNeighbours.containsKey(i)){
                     int sort = closeNeighbours.get(i);
+
                     sort++;
                     closeNeighbours.put(mapEntry.getValue(),sort);
                 }
@@ -169,6 +180,9 @@ public class Main {
         Collections.sort(distanceList);
 
         HashMap<Double,String> neighbours = closest(k,distanceList,distances);
+        //for (Double key: neighbours.keySet()){
+        //    System.out.println("key: "+key + "val" + neighbours.get(key));
+        //}
         String result = sortClosest(k,neighbours);
         return result;
     }
@@ -180,6 +194,7 @@ public class Main {
                 correctPred++;
             }
         }
+        //System.out.println("cp"+correctPred);
         correctPred = (correctPred/instances.size())*100.00;
         return correctPred;
     }
@@ -189,11 +204,11 @@ public class Main {
         main.loadData("iris-training.txt","iris-test.txt");
         ArrayList<String> predictions = new ArrayList<String>();
         for(Iris i: main.testingSet){
-            String result = main.knnAlg(main.trainingSet,i,3);
+            String result = main.knnAlg(main.trainingSet,i,1);
             predictions.add(result);
         }
         double accuracy =  main.getAccuracy(main.testingSet,predictions);
-        System.out.print("The algorithm is "+accuracy+"% accurate");
+        System.out.println("The algorithm is "+accuracy+"% accurate");
 
     }
 
